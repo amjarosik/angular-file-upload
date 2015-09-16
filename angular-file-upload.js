@@ -3,6 +3,7 @@
  https://github.com/nervgh/angular-file-upload
  changes:
    pozbycie sie scope() dla IE9
+   patch z taga 1.1.5
 */
 (function(angular, factory) {
     if (typeof define === 'function' && define.amd) {
@@ -781,6 +782,7 @@ module
                 var isInput = angular.isElement(some);
                 var input = isInput ? angular.element(some) : null;
                 var file = !isInput ? some : null;
+                var scope = uploader.inputScope;
 
                 angular.extend(this, {
                     url: uploader.url,
@@ -805,7 +807,7 @@ module
                     _input: input
                 });
 
-                if (input) this._replaceNode(input);
+                if (input) this._replaceNode(input, scope);
             }
             /**********************
              * PUBLIC
@@ -979,8 +981,8 @@ module
              * @param {JQLite|jQuery} input
              * @private
              */
-            FileItem.prototype._replaceNode = function(input) {
-                var clone = $compile(input.clone())(input.scope());
+            FileItem.prototype._replaceNode = function(input, scope) {
+                var clone = $compile(input.clone())(scope);
                 clone.prop('value', null); // FF fix
                 input.css('display', 'none');
                 input.after(clone); // remove jquery dependency
@@ -1273,7 +1275,7 @@ module
                 if (!(uploader instanceof FileUploader)) {
                     throw new TypeError('"Uploader" must be an instance of FileUploader');
                 }
-
+                uploader.inputScope = scope;
                 var object = new FileUploader.FileSelect({
                     uploader: uploader,
                     element: element
